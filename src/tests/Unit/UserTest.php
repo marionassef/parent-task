@@ -32,18 +32,16 @@ class UserTest extends TestCase
 
     public function testListProviders()
     {
-        app(UserService::class);
         $response = $this->userService->list([]);
         $this->assertCount(6, $response);
     }
 
     public function testListFilteredByInvalidProvider()
     {
-        app(UserService::class);
         try {
             $this->userService->list(['provider' => 'DataProviderZ']);
         } catch (\Exception $exception) {
-            $this->expectErrorMessage($exception->getMessage());
+            $this->assertEquals("Invalid Provider", $exception->getMessage());
         }
     }
 

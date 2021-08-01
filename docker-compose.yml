@@ -1,0 +1,56 @@
+version: "3"
+services:
+  parent_task_webserver:
+    image: nginx:alpine
+    container_name: parent_task_webserver
+    restart: unless-stopped
+    ports:
+      - "7474:80"
+    volumes:
+      - ./src:/var/www
+      - ./nginx/conf.d:/etc/nginx/conf.d/
+      - ./nginx/logs/:/var/log/nginx/
+    networks:
+      - parent_task_network
+
+  parent_task_www:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    container_name: parent_task_www
+    working_dir: /var/www
+    expose:
+      - 3030
+    depends_on:
+      - parent_task_db
+    volumes:
+      - ./src:/var/www/
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - parent_task_network
+
+  parent_task_db:
+    image: mysql:5.7
+    container_name: parent_task_db
+    hostname: parent_task_db
+    restart: unless-stopped
+    command: --explicit_defaults_for_timestamp --ignore-db-dir=lost+found
+    ports:
+      - "7050:3306"
+    environment:
+      MYSQL_DATABASE: "parent_task_db"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: ""
+      MYSQL_ROOT_PASSWORD: ""
+    volumes:
+      - parent_task_db:/var/lib/mysql
+    networks:
+      - parent_task_network
+
+networks:
+  parent_task_network:
+    driver: bridge
+
+volumes:
+  parent_task_db:
