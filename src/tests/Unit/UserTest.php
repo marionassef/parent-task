@@ -20,16 +20,6 @@ class UserTest extends TestCase
         $this->userService = app(UserService::class);
     }
 
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
-    public function test_example()
-    {
-        $this->assertTrue(true);
-    }
-
     public function testListProviders()
     {
         $response = $this->userService->list([]);
